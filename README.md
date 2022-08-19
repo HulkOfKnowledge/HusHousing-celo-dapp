@@ -8,7 +8,7 @@ The Overall Idea of HusHousing is being able to buy not just already made houses
 as well as partaking in Estate Share Holding.
 All these features will be reflected inn subsquent versions of the Dapp.
 
-### Stack
+#### Stack
 Frontend - html,css,boostrap
 Smart Contract - solidity
 Backend- node js
