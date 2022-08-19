@@ -6,7 +6,7 @@ import erc20Abi from "../contract/erc20.abi.json"
 
 
 const ERC20_DECIMALS = 18
-const MPContractAddress = "0xD7ACd2a9FD159E69Bb102A1ca21C9a3e3A5F771B"
+const MPContractAddress = "0xA184Ae05A780A8F8Ce79D71533C021605332F5d8"
 const cUSDContractAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 
 let kit
@@ -15,10 +15,11 @@ let houses = []
 
 const connectCeloWallet = async function () {
   if (window.celo) {
+    notification("⚠️ Please approve this DApp to use it.")
     try {
-      notification("⚠️ Please approve this DApp to use it.")
       await window.celo.enable()
       notificationOff()
+
       const web3 = new Web3(window.celo)
       kit = newKitFromWeb3(web3)
 
@@ -51,7 +52,7 @@ const getBalance = async function () {
 }
 
 const getHouses = async function() {
-  const _numberOfHousesAvailable = await contract.methods.viewNumberOfHousesAvailable().call()
+  const _numberOfHousesAvailable = await contract.methods.viewNumberOfHouseAvailable().call()
   const _houses = []
 
   for (let i = 0; i < _numberOfHousesAvailable; i++) {
@@ -72,16 +73,6 @@ const getHouses = async function() {
   houses = await Promise.all(_houses)
   renderHouses()
 }
-
-
-window.addEventListener('load', async () => {
-  notification("⌛ Loading...")
-  await connectCeloWallet()
-  await getBalance()
-  await getHouses()
-  notificationOff()
-});
-
 
 
 function renderHouses() {
@@ -122,6 +113,7 @@ function houseTemplate(_house) {
   `
 }
 
+
 function identiconTemplate(_address) {
   const icon = blockies
     .create({
@@ -150,12 +142,15 @@ function notificationOff() {
   document.querySelector(".alert").style.display = "none"
 }
 
-window.addEventListener("load", () => {
+
+window.addEventListener('load', async () => {
   notification("⌛ Loading...")
-  getBalance()
-  renderHouses()
+  await connectCeloWallet()
+  await getBalance()
+  await getHouses()
   notificationOff()
-})
+});
+
 
 document
   .querySelector("#newHouseBtn")
@@ -178,10 +173,8 @@ document
       notification(`⚠️ ${error}.`)
     }
     notification(`🎉 You successfully added "${params[0]}".`)
-    viewHouse()
+    getHouses()
   })
-
-
 
 
  document.querySelector("#marketplace").addEventListener("click", async (e) => {
