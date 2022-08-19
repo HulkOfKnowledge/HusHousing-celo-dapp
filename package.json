@@ -1,0 +1,28 @@
+{
+  "main": "index.js",
+  "dependencies": {
+    "@celo/contractkit": "^1.0.2",
+    "bignumber.js": "^9.0.1"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "3.2.0",
+    "webpack": "4.29.6",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.11.2",
+    "friendly-errors-webpack-plugin": "1.7.0"
+  },
+  "scripts": {
+    "dev": "node index.js",
+    "build": "webpack"
+  },
+  "name": "hushousing-celo-project",
+  "description": "A simple celo-inspired smart contract project that allows users view and buy houses using the celo stable token;cUsd.",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HulkOfKnowledge/HusHousing-celo-dapp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://github.com/HulkOfKnowledge/HusHousing-celo-dapp/public/index.html"
+}
