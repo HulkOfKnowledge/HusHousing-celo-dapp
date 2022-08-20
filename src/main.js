@@ -101,13 +101,15 @@ function houseTemplate(_house) {
           <i class="bi bi-geo-alt-fill"></i>
           <span>${_house.location}</span>
         </p>
-        <div class="d-grid gap-2">
-          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
-            _house.index
-          }>
-            Buy for ${_house.price.shiftedBy(-ERC20_DECIMALS).toFixed(2)} cUSD
-          </a>
-        </div>
+        ${_house.owner === kit.defaultAccount? "" :
+          `<div class="d-grid gap-2">
+              <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
+                _house.index
+              }>
+                Buy for ${_house.price.shiftedBy(-ERC20_DECIMALS).toFixed(2)} cUSD
+              </a>
+            </div>`
+        }
       </div>
     </div>
   `
