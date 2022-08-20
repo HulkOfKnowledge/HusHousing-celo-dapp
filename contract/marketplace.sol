@@ -56,7 +56,7 @@ contract Marketplace {
         _;
     }
 
-    modifier exist(uint _index){
+    modifier exist(uint _index) {
         require(exists[_index], "Query of nonexistent house");
         _;
     }
@@ -89,25 +89,9 @@ contract Marketplace {
         public
         view
         exist(_index)
-        returns (
-            address payable,
-            string memory,
-            string memory,
-            string memory,
-            string memory,
-            uint,
-            bool
-        )
+        returns (House memory)
     {
-        return (
-            houses[_index].owner,
-            houses[_index].name,
-            houses[_index].image,
-            houses[_index].description,
-            houses[_index].location,
-            houses[_index].price,
-            houses[_index].sold
-        );
+        return (houses[_index]);
     }
 
     /// @dev allow users to buy a house on sale
@@ -144,7 +128,12 @@ contract Marketplace {
 
     /// @dev allow users to cancel a sale on a house
     /// @notice callable only by the home owner
-    function cancelSale(uint _index) public payable exist(_index) checkIfHouseOwner(_index) {
+    function cancelSale(uint _index)
+        public
+        payable
+        exist(_index)
+        checkIfHouseOwner(_index)
+    {
         houses[_index].sold = true;
     }
 
