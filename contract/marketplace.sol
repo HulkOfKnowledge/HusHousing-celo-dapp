@@ -16,74 +16,68 @@ interface IERC20Token {
 
 contract Marketplace {
 
-    uint internal productsLength = 0;
+    uint internal numberOfHouseAvailable = 0;
     address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
-    struct Product {
+    struct House {
         address payable owner;
         string name;
         string image;
         string description;
         string location;
         uint price;
-        uint sold;
     }
 
-    mapping (uint => Product) internal products;
+    mapping (uint => House) internal houses;
 
-    function writeProduct(
+    function addHouse(
         string memory _name,
         string memory _image,
         string memory _description, 
         string memory _location, 
         uint _price
     ) public {
-        uint _sold = 0;
-        products[productsLength] = Product(
+        houses[numberOfHouseAvailable] = House(
             payable(msg.sender),
             _name,
             _image,
             _description,
             _location,
-            _price,
-            _sold
+            _price
         );
-        productsLength++;
+        numberOfHouseAvailable++;
     }
 
-    function readProduct(uint _index) public view returns (
+    function viewHouse(uint _index) public view returns (
         address payable,
         string memory, 
         string memory, 
         string memory, 
         string memory, 
-        uint, 
         uint
     ) {
         return (
-            products[_index].owner,
-            products[_index].name, 
-            products[_index].image, 
-            products[_index].description, 
-            products[_index].location, 
-            products[_index].price,
-            products[_index].sold
+            houses[_index].owner,
+            houses[_index].name, 
+            houses[_index].image, 
+            houses[_index].description, 
+            houses[_index].location, 
+            houses[_index].price
         );
     }
-    
-    function buyProduct(uint _index) public payable  {
+
+    function buyHouse(uint _index) public payable  {
         require(
           IERC20Token(cUsdTokenAddress).transferFrom(
             msg.sender,
-            products[_index].owner,
-            products[_index].price
+            houses[_index].owner,
+            houses[_index].price
           ),
           "Transfer failed."
         );
-        products[_index].sold++;
     }
     
-    function getProductsLength() public view returns (uint) {
-        return (productsLength);
+    function viewNumberOfHouseAvailable() public view returns (uint) {
+        return (numberOfHouseAvailable);
     }
 }
