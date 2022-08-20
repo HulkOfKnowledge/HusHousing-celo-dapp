@@ -82,6 +82,7 @@ contract Marketplace {
             _price,
             false // sold initialized as false
         );
+         exists[numberOfHouseAvailable] = true;
         numberOfHouseAvailable++;
     }
 
