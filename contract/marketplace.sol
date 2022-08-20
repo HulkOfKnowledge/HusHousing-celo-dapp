@@ -43,6 +43,7 @@ contract Marketplace {
     }
 
     mapping(uint => House) private houses;
+    mapping(uint => bool) private exists;
 
     /// @dev checks if caller is the house owner
     modifier checkIfHouseOwner(uint _index) {
@@ -52,6 +53,11 @@ contract Marketplace {
 
     modifier checkPrice(uint _price) {
         require(_price > 0, "Price must be at least one wei");
+        _;
+    }
+
+    modifier exist(uint _index){
+        require(exists[_index], "Query of nonexistent house");
         _;
     }
 
@@ -82,6 +88,7 @@ contract Marketplace {
     function viewHouse(uint _index)
         public
         view
+        exist(_index)
         returns (
             address payable,
             string memory,
@@ -105,7 +112,7 @@ contract Marketplace {
 
     /// @dev allow users to buy a house on sale
     /// @notice current home owners can't buy their own home
-    function buyHouse(uint _index) public payable {
+    function buyHouse(uint _index) external payable exist(_index) {
         require(
             houses[_index].owner != msg.sender,
             "You can't buy your own houses"
@@ -127,6 +134,7 @@ contract Marketplace {
     function reSellHouse(uint _index, uint _price)
         public
         payable
+        exist(_index)
         checkIfHouseOwner(_index)
         checkPrice(_price)
     {
@@ -136,7 +144,7 @@ contract Marketplace {
 
     /// @dev allow users to cancel a sale on a house
     /// @notice callable only by the home owner
-    function cancelSale(uint _index) public payable checkIfHouseOwner(_index) {
+    function cancelSale(uint _index) public payable exist(_index) checkIfHouseOwner(_index) {
         houses[_index].sold = true;
     }
 
