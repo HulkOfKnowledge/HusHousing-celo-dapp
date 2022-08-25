@@ -15,7 +15,7 @@ let houses = []
 
 const connectCeloWallet = async function () {
   if (window.celo) {
-    notification("⚠️ Please approve this DApp to use it.")
+    notification("⚠️ Please approve HusHousing DApp to gain access...")
     try {
       await window.celo.enable()
       notificationOff()
@@ -85,6 +85,8 @@ function renderHouses() {
   })
 }
 
+
+
 function houseTemplate(_house) {
   return `
     <div class="card mb-4">
@@ -101,7 +103,12 @@ function houseTemplate(_house) {
           <i class="bi bi-geo-alt-fill"></i>
           <span>${_house.location}</span>
         </p>
-        ${_house.owner === kit.defaultAccount? "" :
+        ${(_house.owner === kit.default) && (_house.sold == false) ? `<div class="d-grid gap-2">
+        <a class="btn btn-lg btn-outline-dark resellBtn fs-6 p-3"  id=${_house.index} >
+          Resell 
+        </a>
+      </div>`
+       :
           `<div class="d-grid gap-2">
               <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
                 _house.index
@@ -174,7 +181,7 @@ document
     } catch (error) {
       notification(`⚠️ ${error}.`)
     }
-    notification(`🎉 You successfully added "${params[0]}".`)
+    notification(`🎉 You successfully added "${params[0]}". 🎉`)
     getHouses()
   })
 
@@ -193,11 +200,35 @@ document
       const result = await contract.methods
         .buyHouse(index)
         .send({ from: kit.defaultAccount })
-      notification(`🎉 You successfully bought "${houses[index].name}".`)
+      notification(`🎉 You successfully bought "${houses[index].name}". 🎉`)
       getHouses()
       getBalance()
     } catch (error) {
       notification(`⚠️ ${error}.`)
     }
   }
+
+
+  if (e.target.className.includes("resellBtn")) {
+    const index = e.target.id
+    const price = prompt(`Enter new price for "${houses[index].name} (cUSD) ":`)
+    if (price != null) {
+      price= new BigNumber(price).shiftedBy(ERC20_DECIMALS).toString()
+      notification(`⌛ Reselling "${houses[index].name}"...`)
+      try {
+        const result = await contract.methods
+          .reSellHouse(index,price)
+          .send({ from: kit.defaultAccount })
+      } catch (error) {
+        notification(`⚠️ ${error}.`)
+      }
+      notification(`🎉 You successfully resold "${houses[index].name}". 🎉`)
+      getHouses()
+      getBalance() 
+    }
+    else {
+      alert("⚠️ You must enter a price.")
+    }
+  }
+
 })
