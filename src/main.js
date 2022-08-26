@@ -66,6 +66,7 @@ const getHouses = async function() {
         description: p[3],
         location: p[4],
         price: new BigNumber(p[5]),
+        sold:p[6],
       })
     })
     _houses.push(_house)
@@ -103,14 +104,20 @@ function houseTemplate(_house) {
           <i class="bi bi-geo-alt-fill"></i>
           <span>${_house.location}</span>
         </p>
-        ${(_house.owner === kit.default) && (_house.sold == false) ? `<div class="d-grid gap-2">
+        ${(_house.owner === kit.defaultAccount) && (_house.sold === false)  ? `<div class="d-grid gap-2">
+        <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3"  id=${_house.index} >
+          Cancel Sale 
+        </a>
+      </div>`
+          :
+          _house.owner === kit.defaultAccount ? `<div class="d-grid gap-2">
         <a class="btn btn-lg btn-outline-dark resellBtn fs-6 p-3"  id=${_house.index} >
           Resell 
         </a>
       </div>`
        :
           `<div class="d-grid gap-2">
-              <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
+              <a class="btn btn-lg btn-outline-success buyBtn fs-6 p-3" id=${
                 _house.index
               }>
                 Buy for ${_house.price.shiftedBy(-ERC20_DECIMALS).toFixed(2)} cUSD
@@ -211,9 +218,9 @@ document
 
   if (e.target.className.includes("resellBtn")) {
     const index = e.target.id
-    const price = prompt(`Enter new price for "${houses[index].name} (cUSD) ":`)
+    let price = prompt(`Enter new price for "${houses[index].name} (cUSD) ":`)
     if (price != null) {
-      price= new BigNumber(price).shiftedBy(ERC20_DECIMALS).toString()
+      price= new BigNumber(price)
       notification(`⌛ Reselling "${houses[index].name}"...`)
       try {
         const result = await contract.methods
@@ -231,4 +238,24 @@ document
     }
   }
 
+  if (e.target.className.includes("cancelSaleBtn")) {
+    const index = e.target.id
+    notification("⌛ Waiting for abort-sale approval...")
+    try {
+      await approve(houses[index].price)
+    } catch (error) {
+      notification(`⚠️ ${error}.`)
+    }
+    notification(`⌛ Aborting sale of "${houses[index].name}"...`)
+    try {
+      const result = await contract.methods
+        .cancelSale(index)
+        .send({ from: kit.defaultAccount })
+      notification(`🎉 Cancelling sale of "${houses[index].name}" successful. 🎉`)
+      getHouses()
+      getBalance()
+    } catch (error) {
+      notification(`⚠️ ${error}.`)
+    }
+  }
 })
